@@ -49,6 +49,8 @@ until [ -z $1 ]; do
 	    shift;;
 	-te) te=$2
 	    shift;;
+	-aifconc) aifconc=1
+	    ;;
 	-sigadd) sigadd=1
 	    ;;
 	-modelfree) modelfree=1
@@ -137,9 +139,14 @@ fslroi data szero 0 $nzero
 fslmaths szero -Tmean szero
 fslmaths data -div szero -log -div $te -mul -1 concdata
 #aif
-fslroi aif szero_aif 0 $nzero
-fslmaths szero_aif -Tmean szero_aif
-fslmaths aif -div szero_aif -log -div $te -mul -1 concaif
+if [ -z $aifconc ];
+    # if the AIF is raw timeseries convert to conc
+    fslroi aif szero_aif 0 $nzero
+    fslmaths szero_aif -Tmean szero_aif
+    fslmaths aif -div szero_aif -log -div $te -mul -1 concaif
+else
+    fslmaths aif concaif
+fi
 
 ### --- Analysis ---
 # --- [Model Free] ---
@@ -152,7 +159,7 @@ if [ ! -z $modelfree ] || [ ! -z $modelfreeinit ]; then
     #calculate cbv
     fslmaths concdata -Tmean -mul `${FSLDIR}/bin/fslnvols concdata` concsum
     fslmaths concaif -Tmean -mul `${FSLDIR}/bin/fslnvols concaif` aifsum
-    fslmaths concdata -div aifsum cbv
+    fslmaths concsum -div aifsum cbv
     
     # calcualte MTT
     fslmaths cbv -div modfree_magntiude mtt
@@ -180,6 +187,10 @@ if [ -z $modelfree ]; then
     echo "--inferdelay" >> core_options.txt
     echo "--infermtt" >> core_options.txt
     echo "--inferlambda" >> core_options.txt
+    if [ ! -z $aifconc ]; then
+	# the aif is concentration and we need to tell fabber
+	echo "--aifconc" >> core_options.txt
+    fi
     
     echo "#Verbena analysis options (VM)" > options.txt
     cat core_options.txt >> options.txt
