@@ -71,11 +71,14 @@ fabber=${FSLDIR}/bin/fabber
 asl_mfree=${FSLDIR}/bin/asl_mfree ###~/cproject/asl_mfree/asl_mfree
 mvntool=${FSLDIR}/bin/mvntool
 
+# save the starting directory
+stdir=`pwd`
+
 #### --- Housekeeping ---
 # set the output directory here if not specified
 if [ -z $outflag ]; then
-    echo "Ouput being placed in subdirectory of input directory"
-    outdir=$indir/pervorm;
+    outdir=$stdir/verbena;
+    echo "Ouput being placed in $outdir"
 fi
 
 # Start by looking for the output directory (and create if need be)
@@ -84,8 +87,7 @@ echo "Creating output directory: $outdir"
 mkdir $outdir;
 fi
 
-# save the starting directory
-stdir=`pwd`
+
 
 # make a temp directory to work in
 if [ ! -z $debug ]; then
