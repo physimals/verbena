@@ -233,7 +233,7 @@ if [ -z $modelfree ]; then
 	echo "--max-iterations=20" >> mvoptions.txt 
 	echo "--inferart" >> mvoptions.txt
 	if [ ! -z $sigadd ]; then
-	echo "--artoption" >> mnvoptions.txt
+	echo "--artoption" >> mvoptions.txt
 	fi
 	
 	rm -r vm_mv*
