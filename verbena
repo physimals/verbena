@@ -139,7 +139,7 @@ fslroi data szero 0 $nzero
 fslmaths szero -Tmean szero
 fslmaths data -div szero -log -div $te -mul -1 concdata
 #aif
-if [ -z $aifconc ];
+if [ -z $aifconc ]; then
     # if the AIF is raw timeseries convert to conc
     fslroi aif szero_aif 0 $nzero
     fslmaths szero_aif -Tmean szero_aif
