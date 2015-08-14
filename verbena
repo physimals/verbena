@@ -218,8 +218,13 @@ if [ -z $modelfree ]; then
 # --- [ VM plus MV ] ---
     if [ ! -z $mv ]; then
 	echo "Begin VM + MV analysis"
+
+        #calculate cbv - used for intitalisation (this is just a model-free calculation)
+	fslmaths concdata -Tmean -mul `${FSLDIR}/bin/fslnvols concdata` concsum
+	fslmaths concaif -Tmean -mul `${FSLDIR}/bin/fslnvols concaif` aifsum
+	fslmaths concdata -div aifsum cbv
     
-# sort out intial MVN
+        # sort out intial MVN
 	$mvntool --input=vm/finalMVN.nii.gz --param=1 --output=init_cbf --val --mask=mask
 	fslmaths init_cbf -div 10 init_cbf
 	$mvntool --input=vm/finalMVN.nii.gz --param=1 --output=tempmvn --valim=init_cbf --write --mask=mask
