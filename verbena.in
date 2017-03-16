@@ -8,8 +8,12 @@
 #
 # SHCOPYRIGHT
 
+
+echo "VERBENA version tag '${GIT_SHA1}'"
+echo "last commit '${GIT_DATE}'"
+echo
+
 Usage() {
-    echo "Verbena"
     echo "Perfusion quantification from DSC-MRI using the Vascular Model"
     echo ""
     echo "Usage (optional parameters in {}):"
@@ -69,7 +73,7 @@ until [ -z $1 ]; do
 done
 
 #### --- Procedural ---
-fabber=${FSLDIR}/bin/fabber
+fabber=${FSLDIR}/bin/fabber_dsc
 asl_mfree=${FSLDIR}/bin/asl_mfree ###~/cproject/asl_mfree/asl_mfree
 mvntool=${FSLDIR}/bin/mvntool
 
@@ -99,6 +103,8 @@ else
     tempdir=${tmpbase}_verbena
 fi
 mkdir $tempdir
+# Required for mask generation
+imcp $infile $tempdir
 cd $tempdir
 
 # parameters
@@ -156,18 +162,22 @@ if [ ! -z $modelfree ] || [ ! -z $modelfreeinit ]; then
     # do deconvolution
     $asl_mfree --data=concdata --mask=mask --out=modfree --aif=concaif --dt=$tr
     
+    # ASL_MFREE can produce nans if the mask is poor
+    fslmaths modfree_magntiude -nan modfree_magnitude_nonans
+    fslmaths modfree_residuals -nan modfree_residuals_nonans
+
     #calculate cbv
     fslmaths concdata -Tmean -mul `${FSLDIR}/bin/fslnvols concdata` concsum
     fslmaths concaif -Tmean -mul `${FSLDIR}/bin/fslnvols concaif` aifsum
     fslmaths concsum -div aifsum cbv
     
     # calcualte MTT
-    fslmaths cbv -div modfree_magntiude mtt
+    fslmaths cbv -div modfree_magnitude_nonans mtt
     
     #copy results to output directory
     cd "$stdir"
     mkdir $outdir/modelfree
-    fslmaths $tempdir/modfree_magntiude $outdir/modelfree/rcbf
+    fslmaths $tempdir/modfree_magnitude_nonans $outdir/modelfree/rcbf
     fslmaths $tempdir/cbv $outdir/modelfree/cbv
     fslmaths $tempdir/mtt $outdir/modelfree/mtt
     cd $tempdir
@@ -205,7 +215,7 @@ if [ -z $modelfree ]; then
 	$fabber --data=data --data-order=singlefile --output=init --suppdata=aif --method=vb --max-iterations=1 -@ core_options.txt
 	
 # assemble the intial MVN for fabber
-	$mvntool --input=init/finalMVN --output=init_MVN --param=1 --valim=modfree_magntiude --var=100 --mask=mask --write
+	$mvntool --input=init/finalMVN --output=init_MVN --param=1 --valim=modfree_magnitude_nonans --var=100 --mask=mask --write
 	fslmaths mtt -thr 0.0001 -log mtt_log
 	$mvntool --input=init_MVN --output=init_MVN --param=2 --valim=mtt_log --var=10 --mask=mask --write
 	$mvntool --input=init_MVN --output=init_MVN --param=3 --val=2 --var=1 --mask=mask --write
