@@ -13,11 +13,12 @@ all: ${SCRIPTS}
 
 # Always rebuild scripts
 .PHONY: FORCE
-FORCE:
 
 $(SCRIPTS): %: %.in FORCE
 	sed -e "s/\$${GIT_SHA1}/${GIT_SHA1}/" -e "s/\$${GIT_DATE}/${GIT_DATE}/" $< >$@
 
 clean:
 	rm ${SCRIPTS}
+
+FORCE:
 
