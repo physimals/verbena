@@ -8,6 +8,10 @@
 #
 # SHCOPYRIGHT
 
+# Make script use local copies of helper scripts/programs in the same
+# directory, if present. This allows for multiple versions of the scripts
+# to be used, possibly with bundled dependencies
+PATH=`dirname $0`:${FSLDIR}/bin:${PATH}
 
 echo "VERBENA version tag '${GIT_SHA1}'"
 echo "last commit '${GIT_DATE}'"
@@ -73,9 +77,9 @@ until [ -z $1 ]; do
 done
 
 #### --- Procedural ---
-fabber=${FSLDIR}/bin/fabber_dsc
-asl_mfree=${FSLDIR}/bin/asl_mfree ###~/cproject/asl_mfree/asl_mfree
-mvntool=${FSLDIR}/bin/mvntool
+fabber=fabber_dsc
+asl_mfree=asl_mfree
+mvntool=mvntool
 
 # save the starting directory
 stdir=`pwd`
@@ -99,12 +103,12 @@ fi
 if [ ! -z $debug ]; then
     tempdir=`pwd`/temp
 else
-    tmpbase=`$FSLDIR/bin/tmpnam`
+    tmpbase=`tmpnam`
     tempdir=${tmpbase}_verbena
 fi
 mkdir $tempdir
 # Required for mask generation
-imcp $infile $tempdir
+imcp $infile $tempdir/data
 cd $tempdir
 
 # parameters
@@ -121,7 +125,7 @@ fi
 #### --- Pre-processing ---
 if [ -z $mask ]; then
 # auto generate mask
-    fslmaths $infile -Tmean datamean
+    fslmaths data -Tmean datamean
     bet datamean brain -m
     immv brain_mask mask
 else
@@ -167,8 +171,8 @@ if [ ! -z $modelfree ] || [ ! -z $modelfreeinit ]; then
     fslmaths modfree_residuals -nan modfree_residuals_nonans
 
     #calculate cbv
-    fslmaths concdata -Tmean -mul `${FSLDIR}/bin/fslnvols concdata` concsum
-    fslmaths concaif -Tmean -mul `${FSLDIR}/bin/fslnvols concaif` aifsum
+    fslmaths concdata -Tmean -mul `fslnvols concdata` concsum
+    fslmaths concaif -Tmean -mul `fslnvols concaif` aifsum
     fslmaths concsum -div aifsum cbv
     
     # calcualte MTT
@@ -241,8 +245,8 @@ if [ -z $modelfree ]; then
 	echo "Begin VM + MV analysis"
 
         #calculate cbv - used for intitalisation (this is just a model-free calculation)
-	fslmaths concdata -Tmean -mul `${FSLDIR}/bin/fslnvols concdata` concsum
-	fslmaths concaif -Tmean -mul `${FSLDIR}/bin/fslnvols concaif` aifsum
+	fslmaths concdata -Tmean -mul `fslnvols concdata` concsum
+	fslmaths concaif -Tmean -mul `fslnvols concaif` aifsum
 	fslmaths concdata -div aifsum cbv
     
         # sort out intial MVN
