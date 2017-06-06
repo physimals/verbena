@@ -13,8 +13,8 @@
 # to be used, possibly with bundled dependencies
 PATH=`dirname $0`:${FSLDIR}/bin:${PATH}
 
-echo "VERBENA version tag '${GIT_SHA1}'"
-echo "last commit '${GIT_DATE}'"
+echo "VERBENA version tag '@GIT_SHA1@'"
+echo "last commit '@GIT_DATE@'"
 echo
 
 Usage() {

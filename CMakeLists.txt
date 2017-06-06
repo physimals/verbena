@@ -13,6 +13,6 @@ execute_process(COMMAND
   OUTPUT_VARIABLE GIT_DATE
   ERROR_QUIET OUTPUT_STRIP_TRAILING_WHITESPACE)
 
-configure_file(verbena.in verbena)
+configure_file(verbena.in verbena @ONLY)
 INSTALL(PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/verbena DESTINATION bin)
 
