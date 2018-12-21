@@ -29,8 +29,9 @@ Usage() {
     echo " {-te}     : TE (in s) {default: 0.065 s}"
     echo ""
     echo "Options:"
+    echo " -aifconc       : AIF curve is a concentration curve rather than a signal curve"
     echo " -mv            : Add a macro vascular component"
-    echo "  -sigadd       : Add MV component in signal domain (rather than concentrations)"
+    echo " -sigadd        : Add MV component in signal domain (rather than concentrations)"
     echo " -modelfree     : Run a 'model free' SVD analysis"
     echo " -modelfreeinit : Use a 'model free' analysis as initialization for the VM"
     echo ""
@@ -236,8 +237,8 @@ if [ -z $modelfree ]; then
     cd "$stdir"
     mkdir $outdir/vm
     imcp $tempdir/vm/mean_cbf $outdir/vm/rcbf
-    fslmaths $tempdir/vm/mean_transitm -exp -mas $tempdir/mask $outdir/vm/mtt
-    fslmaths $tempdir/vm/mean_lambda -exp -mas $tempdir/mask $outdir/vm/lambda
+    fslmaths $tempdir/vm/mean_transitm -mas $tempdir/mask $outdir/vm/mtt
+    fslmaths $tempdir/vm/mean_lambda -mas $tempdir/mask $outdir/vm/lambda
     cd $tempdir
     
 # --- [ VM plus MV ] ---
@@ -273,8 +274,8 @@ if [ -z $modelfree ]; then
 	cd "$stdir"
 	mkdir $outdir/vm_mv
 	fslmaths $tempdir/vm_mv/mean_cbf -thr 0 $outdir/vm_mv/rcbf
-	fslmaths $tempdir/vm_mv/mean_transitm -exp -mas $tempdir/mask $outdir/vm_mv/mtt
-	fslmaths $tempdir/vm_mv/mean_lambda -exp -mas $tempdir/mask $outdir/vm_mv/lambda
+	fslmaths $tempdir/vm_mv/mean_transitm -mas $tempdir/mask $outdir/vm_mv/mtt
+	fslmaths $tempdir/vm_mv/mean_lambda -mas $tempdir/mask $outdir/vm_mv/lambda
 	fslmaths $tempdir/vm_mv/mean_abv -thr 0 $outdir/vm_mv/rabv
 	cd $tempdir
     fi
