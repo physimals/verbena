@@ -1,9 +1,9 @@
 Verbena: Vascular Model Based Perfusion Quantification for DSC-MRI
 ------------------------------------------------------------------
 
-.. image:: verbena.png
-   :scale: 50 %
-   :alt: Verbena logo
+.. image:: verbena_image.jpg
+   :scale: 75 %
+   :alt: Verbena image
    :align: right
 
 Verbena is a Bayesian Inference tool for quantification of perfusion and other haemodynamic 
