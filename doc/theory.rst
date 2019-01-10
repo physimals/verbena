@@ -5,7 +5,7 @@ The Vascular Model
 ------------------
 
 The Vascular Model was originally proposed by Ostergaard et al [1]_. and was used for the analysis of DSC 
-data (within a Bayesian like algorithm) by Mouridsen et al. 2006 [2]_. The basic principle follows all 
+data (within a Bayesian like algorithm) by Mouridsen et al. [2]_. The basic principle follows all 
 tracer kinetic studies and treats the concentration of contrast agent in the tissue as the convolution 
 of an arterial input function (AIF) and a residue function. 
 
@@ -59,7 +59,7 @@ The Modified Vascular Model
 
 VERBENA implements a modified version of the Vascular Model whereby the MTT is not pre-calculated 
 from the data, but instead is a further parameter to be estimated as part of the inference applied 
-to the data, see Chappell et al [3]_. This removes the risk of bias from the separate MTT calculation and 
+to the data. This removes the risk of bias from the separate MTT calculation and 
 also allows for a separate macro vascular component to be implemented within the model.
 
 The other model parameter used by Verbena is named lambda and is identified with :math:`\alpha`.
@@ -100,7 +100,6 @@ by multiplicative factors each in the range :math:`[0, 1]` with :math:`R(C_{n+1}
 
 The CPI method allows great flexibility in the shape of the :math:`R(t)` however this is at the cost 
 of larger numbers of model parameters.
-
 
 References
 ----------
