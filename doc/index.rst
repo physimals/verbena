@@ -11,7 +11,7 @@ parameters from Dynamic Susceptibility Contrast perfusion MRI of the brain.
 
 
 VERBENA complements
-the `OXASL <https://oxasl.readthedocs.io/en/latest/>`_ pipeline for the quantification of 
+the `OXASL <https://oxasl.readthedocs.io/>`_ pipeline for the quantification of 
 perfusion using Arterial Spin Labelling MRI and is 
 built on the same core inference algorithm (FABBER). VERBENA uses a specific physiological 
 model for capillary transit of contrast within the blood generally termed the 'vascular model'
@@ -26,9 +26,7 @@ perfusion. An alternative Bayesian Deconvolution approach is also available, but
 distributed as part of FSL. For more information see the reference below and contact the senior
 author.
 
-VERBENA is scheduled for a future release of FSL (it is not to be found in the current release). 
-However, if you are interested in using VERBENA, it is possible to provide a pre-release copy 
-that is compatible with more recent FSL releases.
+VERBENA is included in `FSL <https://fsl.fmrib.ox.ac.uk/fsl/fslwiki>`_ v6.0.1.
 
 .. toctree::
    :maxdepth: 1
@@ -40,23 +38,23 @@ that is compatible with more recent FSL releases.
 Referencing
 ~~~~~~~~~~~
 
-If you use VERBENA in your research, please make sure that you reference the first article listed below.
+If you use VERBENA in your research, please make sure that you reference Chappell et al [1]_.
 
- - *Chappell, M.A., Mehndiratta, A., Calamante F., "Correcting for large vessel contamination in DSC 
-   perfusion MRI by extension to a physiological model of the vasculature", e-print ahead of 
+.. [1] *Chappell, M.A., Mehndiratta, A., Calamante F., "Correcting for large vessel contamination 
+   in DSC perfusion MRI by extension to a physiological model of the vasculature", e-print ahead of 
    publication. doi: 10.1002/mrm.25390*
 
 The following articles provide more background on the original vascular model from which the VERBENA model is derived:
 
- - *Mouridsen K, Friston K, Hjort N, Gyldensted L, Østergaard L, Kiebel S. Bayesian estimation of 
+.. [2] *Mouridsen K, Friston K, Hjort N, Gyldensted L, Østergaard L, Kiebel S. Bayesian estimation of 
    cerebral perfusion using a physiological model of microvasculature. NeuroImage 2006;33:570–579. 
    doi: 10.1016/j.neuroimage.2006.06.015.*
 
- - *Ostergaard L, Chesler D, Weisskoff R, Sorensen A, Rosen B. Modeling Cerebral Blood Flow and Flow 
+.. [3] *Ostergaard L, Chesler D, Weisskoff R, Sorensen A, Rosen B. Modeling Cerebral Blood Flow and Flow 
    Heterogeneity From Magnetic Resonance Residue Data. J Cereb Blood Flow Metab 1999;19:690–699.*
 
 An alternative Bayesian 'non-parametric' deconvolution approach has been published in:
 
- - *Mehndiratta A, MacIntosh BJ, Crane DE, Payne SJ, Chappell MA. A control point interpolation 
+.. [4] *Mehndiratta A, MacIntosh BJ, Crane DE, Payne SJ, Chappell MA. A control point interpolation 
    method for the non-parametric quantification of cerebral haemodynamics from dynamic susceptibility 
    contrast MRI. NeuroImage 2013;64:560–570. doi: 10.1016/j.neuroimage.2012.08.083.*

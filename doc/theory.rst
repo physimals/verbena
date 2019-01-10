@@ -4,8 +4,8 @@ Theory
 The Vascular Model
 ------------------
 
-The Vascular Model was originally proposed by Ostergaard et al. and was used for the analysis of DSC 
-data (within a Bayesian like algorithm) by Mouridsen et al. in 2006. The basic principle follows all 
+The Vascular Model was originally proposed by Ostergaard et al [1]_. and was used for the analysis of DSC 
+data (within a Bayesian like algorithm) by Mouridsen et al. 2006 [2]_. The basic principle follows all 
 tracer kinetic studies and treats the concentration of contrast agent in the tissue as the convolution 
 of an arterial input function (AIF) and a residue function. 
 
@@ -42,7 +42,7 @@ Here :math:`\alpha > 0` and :math:`\beta > 0` describe the shape and scale of th
 In practice DSC measures the effect that this concentration of contrast agent has 
 on the T2* of the voxel which is described by a non-linear transformation. 
 
-.. math::exp
+.. math::
 
     S(t) = S_0e^{r_2C(t)TE}
 
@@ -59,7 +59,7 @@ The Modified Vascular Model
 
 VERBENA implements a modified version of the Vascular Model whereby the MTT is not pre-calculated 
 from the data, but instead is a further parameter to be estimated as part of the inference applied 
-to the data, see Chappell et al.. This removes the risk of bias from the separate MTT calculation and 
+to the data, see Chappell et al [3]_. This removes the risk of bias from the separate MTT calculation and 
 also allows for a separate macro vascular component to be implemented within the model.
 
 The other model parameter used by Verbena is named lambda and is identified with :math:`\alpha`.
@@ -85,7 +85,7 @@ tissue and macro vascular contributions could be done in terms of the concentrat
 voxel. However, since in DSC it is the T2* effect of the concentration that is measured, the summation 
 might be better done with the signals once their effect on T2* has been accounted for. VERBENA offers 
 the option to do either, there is currently no clear evidence as to which is most physically accurate 
-and it is likely that both are an incomplete representation of the reality, see Chappell et al.
+and it is likely that both are an incomplete representation of the reality, see Chappell et al [3]_.
 
 The CPI model
 -------------
@@ -105,13 +105,13 @@ of larger numbers of model parameters.
 References
 ----------
 
- - *Ostergaard L, Chesler D, Weisskoff R, Sorensen A, Rosen B. Modeling Cerebral Blood Flow and Flow 
+.. [1] *Ostergaard L, Chesler D, Weisskoff R, Sorensen A, Rosen B. Modeling Cerebral Blood Flow and Flow 
    Heterogeneity From Magnetic Resonance Residue Data. J Cereb Blood Flow Metab 1999;19:690–699.*
 
- - *Mouridsen K, Friston K, Hjort N, Gyldensted L, Østergaard L, Kiebel S. Bayesian estimation of 
+.. [2] *Mouridsen K, Friston K, Hjort N, Gyldensted L, Østergaard L, Kiebel S. Bayesian estimation of 
    cerebral perfusion using a physiological model of microvasculature. NeuroImage 2006;33:570–579. 
    doi: 10.1016/j.neuroimage.2006.06.015*
 
- - *Chappell, M.A., Mehndiratta, A., Calamante F., "Correcting for large vessel contamination in DSC 
+.. [3] *Chappell, M.A., Mehndiratta, A., Calamante F., "Correcting for large vessel contamination in DSC 
    perfusion MRI by extension to a physiological model of the vasculature", e-print ahead of publication. 
    doi: 10.1002/mrm.25390*
