@@ -1,7 +1,4 @@
-CVS
-*.o
 *~
 .DS_Store
-depend.mk
-verbena
 doc/html
+_version.py
