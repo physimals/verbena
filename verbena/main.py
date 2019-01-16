@@ -17,6 +17,7 @@ import fsl.wrappers as fsl
 
 from fabber import Fabber
 from oxasl import Workspace
+from oxasl.wrappers import fabber
 
 from verbena._version import __version__
 
@@ -29,18 +30,18 @@ def main():
     """
     parser = OptionParser(usage="verbena -i <DSC input file> [options...]", version=__version__)
     parser.add_option("--data", "-i", help="DSC input file")
-    parser.add_option("--aifimg", "-a", help="Voxelwise AIF image file")
+    parser.add_option("--aif", "-a", help="Voxelwise AIF image file")
     parser.add_option("--output", "-o", help="Output directory")
     parser.add_option("--mask", "-m", help="Mask image")
     parser.add_option("--time-delt", "--tr", help="Time resolution (s)", type="float", default=1.5)
-    parser.add_option("--te", "Sequence TE (s)", type="float", default=0.065)
+    parser.add_option("--te", help="Sequence TE (s)", type="float", default=0.065)
     adv = OptionGroup(parser, "Additional options")
-    adv.add_option("--aifconc", type="bool", action="store_true", help="Indicates that the AIF is a concentration-time curve", default=False)
-    adv.add_option("--mv", type="bool", action="store_true", help="Add a macrovascular component", default=False)
-    adv.add_option("--sigadd", type="bool", action="store_true", help="Combine macrovascular and tissue components by summing the signals (rather than concentrations)", default=False)
-    adv.add_option("--modelfree", type="bool", action="store_true", help="Run a 'model free' SVD analysis", default=False)
-    adv.add_option("--modelfreeinit", type="bool", action="store_true", help="Run a 'model free' SVD analysis as initialisation to the VB modelling", default=False)
-    adv.add_option("--debug", type="bool", action="store_true", help="Output debug information", default=False)
+    adv.add_option("--aifconc", action="store_true", help="Indicates that the AIF is a concentration-time curve", default=False)
+    adv.add_option("--mv", action="store_true", help="Add a macrovascular component", default=False)
+    adv.add_option("--sigadd", action="store_true", help="Combine macrovascular and tissue components by summing the signals (rather than concentrations)", default=False)
+    adv.add_option("--modelfree", action="store_true", help="Run a 'model free' SVD analysis", default=False)
+    adv.add_option("--modelfreeinit", action="store_true", help="Run a 'model free' SVD analysis as initialisation to the VB modelling", default=False)
+    adv.add_option("--debug", action="store_true", help="Output debug information", default=False)
     parser.add_option_group(adv)
 
     options, _ = parser.parse_args()
@@ -129,10 +130,11 @@ def do_vascular_model(wsp):
     Do vascular modelling using Fabber
     """
     wsp.log.write("\nBegin VM analysis\n")
-    
-    fab = Fabber()
+    wsp.sub("vm")
+
     options = {
         "data" : wsp.dscdata,
+        "suppdata" : wsp.aif,
         "mask" : wsp.mask,
         "model" : "dsc",
         "te" : wsp.te,
@@ -145,15 +147,15 @@ def do_vascular_model(wsp):
         "noise" : "white",
         "max-iterations" : 20,
     }
-    #if [ ! -z $aifconc ]; then
-	## the aif is concentration and we need to tell fabber
-	#echo "--aifconc" >> core_options.txt
-    #fi
+    if wsp.aifconc:
+        options["--aifconc"] = True
+    else:
+        options["--aifsig"] = True
 
     if wsp.modelfreeinit:
+        raise NotImplementedError("modelfree")
         # make inital parameter estimates from model-free analysis
         # run fabber to get the right sized MVN
-        pass
 	    #rm -r init*
 	    #$fabber --data=data --data-order=singlefile --output=init --suppdata=aif --method=vb --max-iterations=1 -@ core_options.txt
         
@@ -167,52 +169,50 @@ def do_vascular_model(wsp):
         
         #echo "--continue-from-mvn=init_MVN --continue-fwd-only" >> options.txt
 
-    fab.run(options)    
-    #$fabber --data=data --data-order=singlefile --output=vm --suppdata=aif  -@ options.txt
+    #result = fab.run(options)
+    print(options)
+    result = fabber(options, output=fsl.LOAD, progress_log=wsp.log, log=wsp.fsllog)
+    for key, value in result.items():
+        print("Data", key)
+        setattr(wsp.vm, key, value)
+    if wsp.vm.logfile is not None:
+        wsp.vm.set_item("logfile", step_wsp.logfile, save_fn=str)
     
-    #copy results to output directory
-    #cd "$stdir"
-    #mkdir $outdir/vm
-    #imcp $tempdir/vm/mean_cbf $outdir/vm/rcbf
-    #fslmaths $tempdir/vm/mean_transitm -mas $tempdir/mask $outdir/vm/mtt
-    #fslmaths $tempdir/vm/mean_lambda -mas $tempdir/mask $outdir/vm/lambda
-    #cd $tempdir
-    
-    # --- [ VM plus MV ] ---
-    #if [ ! -z $mv ]; then
-	#echo "Begin VM + MV analysis"
-
-    #calculate cbv - used for intitalisation (this is just a model-free calculation)
-	#fslmaths concdata -Tmean -mul `fslnvols concdata` concsum
-	#fslmaths concaif -Tmean -mul `fslnvols concaif` aifsum
-	#fslmaths concdata -div aifsum cbv
-    
-    # sort out intial MVN
-	#$mvntool --input=vm/finalMVN.nii.gz --param=1 --output=init_cbf --val --mask=mask
-	#fslmaths init_cbf -div 10 init_cbf
-	#$mvntool --input=vm/finalMVN.nii.gz --param=1 --output=tempmvn --valim=init_cbf --write --mask=mask
-	#$mvntool --input=tempmvn --param=6 --output=tempmvn --valim=cbv --var=0.1 --new --mask=mask
-	#$mvntool --input=tempmvn.nii.gz --param=7 --output=tempmvn --val=5 --var=1 --new --mask=mask
-	
-	#echo "#Verneba analysis options (VM+MV)" > mvoptions.txt
-	#cat core_options.txt >> mvoptions.txt
-	#echo "--method=spatialvb" >> mvoptions.txt
-	#echo "--param-spatial-priors=MNNNMAN" >> mvoptions.txt
-	#echo "--max-iterations=20" >> mvoptions.txt 
-	#echo "--inferart" >> mvoptions.txt
-	#if [ ! -z $sigadd ]; then
-	#echo "--artoption" >> mvoptions.txt
-	#fi
-	
-	#rm -r vm_mv*
-	#$fabber --data=data --data-order=singlefile --suppdata=aif --output=vm_mv --continue-from-mvn=tempmvn -@ mvoptions.txt
-	
-    #copy results to output directory
-	#cd "$stdir"
-	#mkdir $outdir/vm_mv
-	#fslmaths $tempdir/vm_mv/mean_cbf -thr 0 $outdir/vm_mv/rcbf
-	#fslmaths $tempdir/vm_mv/mean_transitm -mas $tempdir/mask $outdir/vm_mv/mtt
-	#fslmaths $tempdir/vm_mv/mean_lambda -mas $tempdir/mask $outdir/vm_mv/lambda
-	#fslmaths $tempdir/vm_mv/mean_abv -thr 0 $outdir/vm_mv/rabv
-	#cd $tempdir
-    #fi
+    # Macrovascular component
+    if wsp.mv:
+        wsp.log.write(" - Begin VM + MV analysis\n")
+        raise NotImplementedError("MV component")
+        #calculate cbv - used for intitalisation (this is just a model-free calculation)
+        #fslmaths concdata -Tmean -mul `fslnvols concdata` concsum
+        #fslmaths concaif -Tmean -mul `fslnvols concaif` aifsum
+        #fslmaths concdata -div aifsum cbv
+        
+        # sort out intial MVN
+        #$mvntool --input=vm/finalMVN.nii.gz --param=1 --output=init_cbf --val --mask=mask
+        #fslmaths init_cbf -div 10 init_cbf
+        #$mvntool --input=vm/finalMVN.nii.gz --param=1 --output=tempmvn --valim=init_cbf --write --mask=mask
+        #$mvntool --input=tempmvn --param=6 --output=tempmvn --valim=cbv --var=0.1 --new --mask=mask
+        #$mvntool --input=tempmvn.nii.gz --param=7 --output=tempmvn --val=5 --var=1 --new --mask=mask
+        
+        #echo "#Verneba analysis options (VM+MV)" > mvoptions.txt
+        #cat core_options.txt >> mvoptions.txt
+        #echo "--method=spatialvb" >> mvoptions.txt
+        #echo "--param-spatial-priors=MNNNMAN" >> mvoptions.txt
+        #echo "--max-iterations=20" >> mvoptions.txt 
+        #echo "--inferart" >> mvoptions.txt
+        #if [ ! -z $sigadd ]; then
+        #echo "--artoption" >> mvoptions.txt
+        #fi
+        
+        #rm -r vm_mv*
+        #$fabber --data=data --data-order=singlefile --suppdata=aif --output=vm_mv --continue-from-mvn=tempmvn -@ mvoptions.txt
+        
+        #copy results to output directory
+        #cd "$stdir"
+        #mkdir $outdir/vm_mv
+        #fslmaths $tempdir/vm_mv/mean_cbf -thr 0 $outdir/vm_mv/rcbf
+        #fslmaths $tempdir/vm_mv/mean_transitm -mas $tempdir/mask $outdir/vm_mv/mtt
+        #fslmaths $tempdir/vm_mv/mean_lambda -mas $tempdir/mask $outdir/vm_mv/lambda
+        #fslmaths $tempdir/vm_mv/mean_abv -thr 0 $outdir/vm_mv/rabv
+        #cd $tempdir
+        #fi
