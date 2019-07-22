@@ -210,7 +210,7 @@ if [ -z $modelfree ]; then
     echo "#Verbena analysis options (VM)" > options.txt
     cat core_options.txt >> options.txt
     echo "--method=spatialvb" >> options.txt
-    echo "--param-spatial-priors=N+M" >> options.txt
+    echo "--param-spatial-priors=MN+" >> options.txt
     echo "--max-iterations=20" >> options.txt 
     
     if [ ! -z $modelfreeinit ]; then
@@ -220,12 +220,12 @@ if [ -z $modelfree ]; then
 	$fabber --data=data --data-order=singlefile --output=init --suppdata=aif --method=vb --max-iterations=1 -@ core_options.txt
 	
 # assemble the intial MVN for fabber
-	$mvntool --input=init/finalMVN --output=init_MVN --param=1 --valim=modfree_magnitude_nonans --var=100 --mask=mask --write
+	$mvntool --input=init/finalMVN --output=init_MVN --param=2 --valim=modfree_magnitude_nonans --var=100 --mask=mask --write
 	fslmaths mtt -thr 0.0001 -log mtt_log
-	$mvntool --input=init_MVN --output=init_MVN --param=2 --valim=mtt_log --var=10 --mask=mask --write
-	$mvntool --input=init_MVN --output=init_MVN --param=3 --val=2 --var=1 --mask=mask --write
-	$mvntool --input=init_MVN --output=init_MVN --param=4 --val=5 --var=1 --mask=mask --write
-	$mvntool --input=init_MVN --output=init_MVN --param=5 --valim=szero --var=1 --mask=mask --write
+	$mvntool --input=init_MVN --output=init_MVN --param=4 --valim=mtt_log --var=10 --mask=mask --write
+	$mvntool --input=init_MVN --output=init_MVN --param=5 --val=2 --var=1 --mask=mask --write
+	$mvntool --input=init_MVN --output=init_MVN --param=3 --val=5 --var=1 --mask=mask --write
+	$mvntool --input=init_MVN --output=init_MVN --param=1 --valim=szero --var=1 --mask=mask --write
 	
 	echo "--continue-from-mvn=init_MVN --continue-fwd-only" >> options.txt
     fi
@@ -251,16 +251,16 @@ if [ -z $modelfree ]; then
 	fslmaths concdata -div aifsum cbv
     
         # sort out intial MVN
-	$mvntool --input=vm/finalMVN.nii.gz --param=1 --output=init_cbf --val --mask=mask
+	$mvntool --input=vm/finalMVN.nii.gz --param=2 --output=init_cbf --val --mask=mask
 	fslmaths init_cbf -div 10 init_cbf
-	$mvntool --input=vm/finalMVN.nii.gz --param=1 --output=tempmvn --valim=init_cbf --write --mask=mask
-	$mvntool --input=tempmvn --param=6 --output=tempmvn --valim=cbv --var=0.1 --new --mask=mask
-	$mvntool --input=tempmvn.nii.gz --param=7 --output=tempmvn --val=5 --var=1 --new --mask=mask
+	$mvntool --input=vm/finalMVN.nii.gz --param=2 --output=tempmvn --valim=init_cbf --write --mask=mask
+	$mvntool --input=tempmvn --param=4 --output=tempmvn --valim=cbv --var=0.1 --new --mask=mask
+	$mvntool --input=tempmvn.nii.gz --param=5 --output=tempmvn --val=5 --var=1 --new --mask=mask
 	
 	echo "#Verneba analysis options (VM+MV)" > mvoptions.txt
 	cat core_options.txt >> mvoptions.txt
 	echo "--method=spatialvb" >> mvoptions.txt
-	echo "--param-spatial-priors=MNNNMAN" >> mvoptions.txt
+	echo "--param-spatial-priors=MMNANNN" >> mvoptions.txt
 	echo "--max-iterations=20" >> mvoptions.txt 
 	echo "--inferart" >> mvoptions.txt
 	if [ ! -z $sigadd ]; then
