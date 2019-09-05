@@ -9,16 +9,17 @@ Verbena: Vascular Model Based Perfusion Quantification for DSC-MRI
 Verbena is a Bayesian Inference tool for quantification of perfusion and other haemodynamic 
 parameters from Dynamic Susceptibility Contrast perfusion MRI of the brain. 
 
-
 VERBENA complements
 the `OXASL <https://oxasl.readthedocs.io/>`_ pipeline for the quantification of 
 perfusion using Arterial Spin Labelling MRI and is 
-built on the same core inference algorithm (FABBER). VERBENA uses a specific physiological 
+built on the same core inference algorithm (`FABBER <https://fabber_core.readthedocs.io>`_). 
+
+VERBENA uses a specific physiological 
 model for capillary transit of contrast within the blood generally termed the 'vascular model'
 that was first described by Ostergaard (see below). In VERBENA the model has been extended to 
 explicitly infer the mean transit time and also to optionally include correction for macro 
 vascular contamination - contrast agent within arterial vessels - more information on the 
-model can be found in the `theory <theory.html>`_ section.
+model can be found in the `theory section of the FABBER_DSC documentation <https://fabber-dsc.readthedocs.io/en/latest/theory.html>`_.
 
 VERBENA takes a model-based approach to the analysis of DSC-MRI data in contrast to alternative 
 'non-parametric' approaches, that often use a Singular Value based Deconvolution to quantify 
@@ -33,7 +34,6 @@ VERBENA is included in `FSL <https://fsl.fmrib.ox.ac.uk/fsl/fslwiki>`_ v6.0.1.
    :caption: Contents:
   
    command
-   theory
 
 Referencing
 ~~~~~~~~~~~
