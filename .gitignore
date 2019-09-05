@@ -2,3 +2,6 @@
 .DS_Store
 doc/html
 _version.py
+build
+dist
+verbena.egg-info
