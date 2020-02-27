@@ -197,6 +197,7 @@ if [ -z $modelfree ]; then
     echo "--mask=mask" >> core_options.txt
     echo "--noise=white" >> core_options.txt
     echo "--model=dsc" >> core_options.txt
+    echo "--allow-bad-voxels" >> core_options.txt
     echo "--te=$te" >> core_options.txt
     echo "--delt=$tr" >> core_options.txt
     echo "--inferdelay" >> core_options.txt
