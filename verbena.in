@@ -68,6 +68,8 @@ until [ -z $1 ]; do
 	    ;;
 	-modelfreeinit) modelfreeinit=1
 	    ;;
+	-logcbf) logcbf=1
+	    ;;
 	-debug) debug=1;; #debugging option
 	*)  Usage
 	    echo "Error! Unrecognised option on command line: $1"
@@ -198,6 +200,7 @@ if [ -z $modelfree ]; then
     echo "--noise=white" >> core_options.txt
     echo "--model=dsc" >> core_options.txt
     echo "--allow-bad-voxels" >> core_options.txt
+    echo "--save-model-fit" >> core_options.txt
     echo "--te=$te" >> core_options.txt
     echo "--delt=$tr" >> core_options.txt
     echo "--inferdelay" >> core_options.txt
@@ -206,6 +209,14 @@ if [ -z $modelfree ]; then
     if [ ! -z $aifconc ]; then
 	# the aif is concentration and we need to tell fabber
 	echo "--aifconc" >> core_options.txt
+    fi
+
+    if [ ! -z $logcbf ]; then
+	# Infer log of CBF internally. Need to increase prior
+    # precision slightly to avoid overflows
+	echo "--PSP_byname1=cbf" >> core_options.txt
+	echo "--PSP_byname1_transform=L" >> core_options.txt
+	echo "--PSP_byname1_prec=0.0001" >> core_options.txt
     fi
     
     echo "#Verbena analysis options (VM)" > options.txt
