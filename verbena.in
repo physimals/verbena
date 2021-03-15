@@ -34,6 +34,8 @@ Usage() {
     echo " -sigadd        : Add MV component in signal domain (rather than concentrations)"
     echo " -modelfree     : Run a 'model free' SVD analysis"
     echo " -modelfreeinit : Use a 'model free' analysis as initialization for the VM"
+    echo " -save-residue  : Save the residue function output from the VM"
+    echo " -save-model-fit: Save the model fit output from the VM"
     echo ""
 }
 
@@ -69,6 +71,10 @@ until [ -z $1 ]; do
 	-modelfreeinit) modelfreeinit=1
 	    ;;
 	-logcbf) logcbf=1
+	    ;;
+	-save-residue) save_residue=1
+	    ;;
+	-save-model-fit) save_model_fit=1
 	    ;;
 	-debug) debug=1;; #debugging option
 	*)  Usage
@@ -211,6 +217,11 @@ if [ -z $modelfree ]; then
 	echo "--aifconc" >> core_options.txt
     fi
 
+    if [ ! -z $save_residue ]; then
+	# Save the residue function which is a model 'extra'
+	echo "--save-model-extras" >> core_options.txt
+    fi
+
     if [ ! -z $logcbf ]; then
 	# Infer log of CBF internally. Need to increase prior
     # precision slightly to avoid overflows
@@ -226,12 +237,12 @@ if [ -z $modelfree ]; then
     echo "--max-iterations=20" >> options.txt 
     
     if [ ! -z $modelfreeinit ]; then
-# make inital parameter estimates from model-free analysis
-# run fabber to get the right sized MVN
+    # make inital parameter estimates from model-free analysis
+    # run fabber to get the right sized MVN
 	rm -r init*
 	$fabber --data=data --data-order=singlefile --output=init --suppdata=aif --method=vb --max-iterations=1 -@ core_options.txt
 	
-# assemble the intial MVN for fabber
+    # assemble the intial MVN for fabber
 	$mvntool --input=init/finalMVN --output=init_MVN --param=2 --valim=modfree_magnitude_nonans --var=100 --mask=mask --write
 	fslmaths mtt -thr 0.0001 -log mtt_log
 	$mvntool --input=init_MVN --output=init_MVN --param=4 --valim=mtt_log --var=10 --mask=mask --write
@@ -245,12 +256,18 @@ if [ -z $modelfree ]; then
     rm -r vm*
     $fabber --data=data --data-order=singlefile --output=vm --suppdata=aif  -@ options.txt
     
-#copy results to output directory
+    #copy results to output directory
     cd "$stdir"
     mkdir $outdir/vm
     imcp $tempdir/vm/mean_cbf $outdir/vm/rcbf
     fslmaths $tempdir/vm/mean_transitm -mas $tempdir/mask $outdir/vm/mtt
     fslmaths $tempdir/vm/mean_lambda -mas $tempdir/mask $outdir/vm/lambda
+	if [ ! -z $save_residue ]; then
+        fslmaths $tempdir/vm/dsc_residual -mas $tempdir/mask $outdir/vm/residue
+    fi
+	if [ ! -z $save_model_fit ]; then
+        fslmaths $tempdir/vm/modelfit -mas $tempdir/mask $outdir/vm/modelfit
+    fi
     cd $tempdir
     
 # --- [ VM plus MV ] ---
@@ -289,7 +306,13 @@ if [ -z $modelfree ]; then
 	fslmaths $tempdir/vm_mv/mean_transitm -mas $tempdir/mask $outdir/vm_mv/mtt
 	fslmaths $tempdir/vm_mv/mean_lambda -mas $tempdir/mask $outdir/vm_mv/lambda
 	fslmaths $tempdir/vm_mv/mean_abv -thr 0 $outdir/vm_mv/rabv
-	cd $tempdir
+	if [ ! -z $save_residue ]; then
+        fslmaths $tempdir/vm_mv/dsc_residual -mas $tempdir/mask $outdir/vm_mv/residue
+    fi
+	if [ ! -z $save_model_fit ]; then
+        fslmaths $tempdir/vm_mv/modelfit -mas $tempdir/mask $outdir/vm_mv/modelfit
+    fi
+    cd $tempdir
     fi
 fi
 
