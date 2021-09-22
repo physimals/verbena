@@ -41,6 +41,8 @@ Usage() {
     echo " -modelfreeinit : Use a 'model free' analysis as initialization for the VM"
     echo " -save-residue  : Save the residue function output from the VM"
     echo " -save-model-fit: Save the model fit output from the VM"
+    echo " -logcbf        : Use log transformation on CBF parameter (can improve stability of fitting)"
+    echo " -debug         : Save additional fitting data to a folder named 'temp'"
     echo ""
 }
 
