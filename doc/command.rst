@@ -14,6 +14,11 @@ Maps of these are placed in the output directory. Analysis is only performed wit
 mask supplied (``mask.nii.gz``) which will normally have been derived from a brain extraction using 
 BET or other equivalent tool.
 
+Note that you should ensure that your data is scaled so that intensity values are not too large (e.g. of
+the order of 1000 at most). Very large absolute intensity values (e.g. more than 10^5) can cause problems
+with the Bayesian inference as 'large' variances used for non-informative priors are no longer 'large'
+compared to the data values.
+
 AIFs
 ----
 
@@ -39,8 +44,8 @@ Acquisition parameters
 ----------------------
 
 The ``-tr=TR`` option is used to specify the time resolution of the data in seconds, i.e. the time spacing 
-between volumes. The ``-te=TE`` option specifies the assumed TE of tissue, used for conversion of 
-concentration to signal
+between volumes. Note that this does not always correspond to the repetition time (TR) of the acquisition
+sequence. The ``-te=TE`` option specifies the sequence TE in seconds. 
 
 Macro vascular contamination
 ----------------------------
@@ -53,6 +58,15 @@ Blood Volume (``rABV``) in relative units.
 By default the additional macro vascular component is added 
 when the concentration time course of the voxel is calculated, optionally addition of the tissue 
 and macro vascular component can be done as signal time courses using the ``-sigadd`` option.
+
+Log transformation
+------------------
+
+By adding the -logcbf option, the model will internally infer the log of the CBF parameter 
+rather than it's absolute value. This transformation is 'undone' on output so the meaning of
+the CBF output is unchanged. This option prevents CBF from being negative which can sometimes
+cause the fitting to be badly behaved, so it is well worth trying this option if you do not
+get a good fit to your data.
 
 'Model-Free' Analysis
 ---------------------
